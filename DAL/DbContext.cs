@@ -8,15 +8,20 @@ namespace TimeClock.DAL
     {
         static IConfiguration? builder;
         static string? connString;
+        static private bool isFirstLoad = true;
         static void InitConnString()
         {
+          isFirstLoad = false;
           builder = new ConfigurationBuilder()
           .AddJsonFile("secrets.json", optional: true)
           .Build();
           connString = builder["ConnectionString"];
         }
         static  public DataTable MakeQuery(string query, List<SqlParameter>? sqlParams = null) {
-            InitConnString();
+            if(isFirstLoad)
+            { 
+                InitConnString();
+            }
             DataTable outPut = new();
             using (SqlConnection conn = new(connString)) {
                 try
